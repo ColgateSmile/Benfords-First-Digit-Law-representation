@@ -1,121 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Fibonacci Histogram</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fibonacci & Benford's Law</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <style>
         body {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
             margin-top: 20px;
-            margin-bottom: 20px;
+            color: #343a40;
         }
-        .container {
-            max-width: 100%;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            padding: 20px;
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff !important;
         }
-        .form-group {
-            margin-bottom: 20px;
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        #fibonacciList {
-            margin-top: 20px;
-            font-size: 18px;
+        #histogram {
+            margin-top: 30px;
         }
-        #benfordsLawExplanation {
-            margin-top: 20px;
-            font-size: 16px;
-        }
-        #footer {
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 0;
             text-align: center;
-            font-size: 14px;
-            margin-top: 20px;
-            color: #666;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-4">Fibonacci Histogram</h1>
-        <div class="form-group">
-            <label for="nInput">Enter the number of Fibonacci members to generate:</label>
-            <input type="number" id="nInput" class="form-control" min="1">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Fibonacci & Benford</a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Fibonacci Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Fibonacci Histogram</h2>
+                    <p class="card-text">Generate a histogram showing the distribution of the first digits in the Fibonacci sequence.</p>
+                    <div class="form-group">
+                        <label for="nInput" class="form-label">Number of Fibonacci members:</label>
+                        <input type="number" id="nInput" class="form-control" min="1" placeholder="e.g., 100">
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" onclick="generateFibonacci()">Generate</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- Center the "Generate" button -->
-        <div class="text-center">
-            <button class="btn btn-primary" onclick="generateFibonacci()">Generate</button>
-        </div>
-        <p id="fibonacciList" class="mt-3"></p>
-        <div id="histogram" class="mt-3">
-            <!-- Explanation of Benford's Law -->
-            <div id="benfordsLawExplanation">
-                <h2>Benford's Law (First-Digit Law)</h2>
-                <p><strong>Background:</strong> Benford's Law, also known as the "First-Digit Law," is a statistical principle that describes the distribution of leading digits in many real-life datasets.</p>
-                <p><strong>Explanation:</strong> Benford's Law states that in many naturally occurring datasets, the leading digit (i.e., the first digit) is not uniformly distributed.</p>
-                <p><strong>Applications:</strong> Benford's Law has diverse applications, including fraud detection, forensic accounting, and quality control.</p>
-                <p><strong>Example:</strong> Imagine a dataset of financial transactions where the leading digits of amounts are subject to Benford's Law.</p>
-                <p><strong>Conclusion:</strong> Benford's Law is a powerful tool for data analysis and fraud detection. Understanding its implications can be valuable in various fields, ensuring the integrity and accuracy of datasets.</p>
+
+        <!-- Benford's Law Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Understanding Benford's Law</h2>
+                    <p class="card-text">Benford's Law describes the statistical distribution of leading digits in many real-world datasets. In sets that obey the law, the number 1 appears as the leading significant digit about 30% of the time, while 9 appears as the leading significant digit less than 5% of the time. Uniformly distributed digits would each occur about 11.1% of the time. </p>
+                    <ul>
+                        <li><strong>Applications:</strong> Fraud detection, forensic accounting, and scientific research.</li>
+                        <li><strong>Examples:</strong> Financial data, population stats, election results.</li>
+
+                    </ul>
+                    <a href="https://en.wikipedia.org/wiki/Benford%27s_law" target="_blank" class="btn btn-primary">Learn More</a>
+                </div>
             </div>
         </div>
     </div>
-    <div id="footer" class="mt-4">
-        &copy; 2023 Fibonacci Histogram | Created by [Dror Mor]
+
+    <!-- Histogram Section -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="histogram" class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Histogram of First Digits</h2>
+                    <p>See the frequency of first digits in the Fibonacci sequence below:</p>
+                    <div id="chartContainer"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        function generateFibonacci() {
-            const n = parseInt(document.getElementById("nInput").value);
-            if (n <= 0) {
-                alert("Please enter a positive integer for N.");
-                return;
-            }
-            let a = 0, b = 1, c;
-            for (let i = 2; i <= n; i++) {
-                c = a + b;
-                a = b;
-                b = c;
-            }
-            document.getElementById("fibonacciList").textContent = n + `th Fibonacci Number: ${c}`;
-            // Count the first digit appearances for the first N members
-            const firstDigitCount = new Array(10).fill(0);
-            let fibonacciNumbers = [a, b];
-            for (let i = 2; i < n; i++) {
-                c = a + b;
-                fibonacciNumbers.push(c);
-                a = b;
-                b = c;
-                let firstDigit = parseInt(c.toString()[0]);
-                firstDigitCount[firstDigit]++;
-            }
-            // Create the histogram using Highcharts
-            Highcharts.chart('histogram', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'First Digit Histogram'
-                },
-                xAxis: {
-                    categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-                },
-                yAxis: {
-                    title: {
-                        text: 'Count'
-                    }
-                },
-                series: [{
-                    name: 'Count',
-                    data: firstDigitCount.slice(1)
-                }]
-            });
+</div>
+
+<!-- Footer -->
+<footer class="mt-4">
+    <p>&copy; 2024 Fibonacci & Benford | Created by <strong>Dror Mor</strong></p>
+</footer>
+
+<script>
+    function generateFibonacci() {
+        const n = parseInt(document.getElementById("nInput").value);
+
+        if (!n || n <= 0) {
+            alert("Please enter a valid positive integer for the number of Fibonacci members.");
+            return;
         }
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        let a = 0, b = 1;
+        const firstDigitCount = new Array(10).fill(0);
+
+        // Generate the Fibonacci sequence and count the first digits
+        for (let i = 0; i < n; i++) {
+            const fibNum = i < 2 ? i : a + b; // Compute Fibonacci number
+            if (i >= 2) {
+                a = b;
+                b = fibNum;
+            }
+            const firstDigit = parseInt(fibNum.toString()[0]); // Get the first digit
+            firstDigitCount[firstDigit]++;
+        }
+
+        // Total count of numbers (sum of all counts for digits 1-9)
+        const totalCount = firstDigitCount.slice(1).reduce((sum, count) => sum + count, 0);
+
+        // Generate the histogram with percentage tooltips
+        Highcharts.chart('chartContainer', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Fibonacci Sequence: First Digit Histogram'
+            },
+            xAxis: {
+                categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+                title: {
+                    text: 'First Digit'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Frequency'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    const percentage = ((this.y / totalCount) * 100).toFixed(2);
+                    return `<b>${this.x}</b><br>Count: ${this.y}<br>Percentage: ${percentage}%`;
+                }
+            },
+            series: [{
+                name: 'Count',
+                data: firstDigitCount.slice(1), // Exclude index 0 as no Fibonacci number starts with 0
+                colorByPoint: true
+            }]
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
